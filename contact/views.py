@@ -29,6 +29,7 @@ from django.core.mail import send_mail
 from settings.salon_context_processor import get_salon_data
 from settings.models import Salon
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -641,8 +642,8 @@ def submit_review(request):
             return JsonResponse({'success': True, 'reviews_html': reviews_html})
         except IntegrityError:
             return JsonResponse({'success': False, 'message': 'An error occurred while saving the review.'})
-    else:
-        return JsonResponse({'success': False, 'message': 'Form data is not valid.'})
+
+    return JsonResponse({'success': False, 'message': 'Form data is not valid.'})
         
 
 class VisitorAppointmentListView(ListView):
@@ -653,8 +654,7 @@ class VisitorAppointmentListView(ListView):
         email = self.request.POST.get('email', 'name')
         if email:
             return Appointment.objects.filter(email=email, name=self.request.POST.get('name', ''))
-        else:
-            return Appointment.objects.none()
+        return Appointment.objects.none()
 
 class VisitorReviewListView(ListView):
     model = Review
@@ -664,15 +664,17 @@ class VisitorReviewListView(ListView):
         email = self.request.POST.get('email', 'name')
         if email:
             return Review.objects.filter(email=email, name=self.request.POST.get('name', ''))
-        else:
-            return Review.objects.none()
+        return Review.objects.none()
 
 
 
 @login_required
 def management_view(request):
     appointment_list = Appointment.objects.all().order_by('-id')
+    current_date = timezone.now().date()
     barber_list = Barber.objects.all()
+    upcoming_appointments = Appointment.objects.filter(date__gte=current_date).order_by('date', 'time')
+    done_appointments = Appointment.objects.filter(date__lt=current_date).order_by('-date', '-time')
     review_list = Review.objects.all()
     gallery_item_list = GalleryItem.objects.all()
     category_list = Category.objects.all()
@@ -682,6 +684,8 @@ def management_view(request):
     
     context = {
         'appointment_list': appointment_list,
+        'upcoming_appointments': upcoming_appointments,
+        'done_appointments': done_appointments,
         'barber_list': barber_list,
         'review_list': review_list,
         'gallery_item_list': gallery_item_list,

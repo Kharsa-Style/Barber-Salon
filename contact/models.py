@@ -90,8 +90,7 @@ class Review(models.Model):
     def __str__(self):
         if self.barber:
             return f"{self.customer_name} - {self.barber.name}"
-        else:
-            return f"{self.customer_name} - No associated barber"
+        return f"{self.customer_name} - No associated barber"
         
     def barber_review_count(self):
         return Review.objects.filter(barber=self.barber).count()
@@ -152,7 +151,7 @@ class Appointment(models.Model):
     service_type = models.ForeignKey(Service, on_delete=models.SET_NULL, null=True, blank=True, related_name='appointment_service')
     phone = models.CharField(_('Telefon'),max_length=15)
     email = models.EmailField(_('Email'),default='no-reply@example.com')
-    message = models.TextField(_('Nachricht'),max_length=200, null=True)
+    message = models.TextField(_('Nachricht'),max_length=200, null=True, blank=True)
     slug = models.SlugField(_('Slug'), blank=True, null=True)
     
     def save(self, *args, **kwargs):
@@ -163,8 +162,7 @@ class Appointment(models.Model):
     def __str__(self):
         if self.barber:
             return f"{self.name} - {self.barber.name}"
-        else:
-            return f"{self.name} - No associated barber"
+        return f"{self.name} - No associated barber"
         
     @classmethod
     def total_count(cls):

@@ -47,13 +47,13 @@ class ModelListAPIView(generics.ListAPIView):
         return self.queryset
 
 class ModelCreateAPIView(generics.CreateAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return self.queryset
     
 class ModelRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         return self.queryset
@@ -237,8 +237,7 @@ class VisitorAppointmentListAPIView(ListAPIView):
 
         if email:
             return Appointment.objects.filter(Q(email=email))
-        else:
-            return Appointment.objects.filter()
+        return Appointment.objects.filter()
 
 
 class VisitorReviewListAPIView(ListAPIView):
